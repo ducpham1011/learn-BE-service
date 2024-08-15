@@ -5,7 +5,6 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import router from './router/index.js'
-import BaseResponse from "./model/base_respone.js";
 
 const app = express();
 
@@ -21,7 +20,7 @@ server.listen(8080, () => {
     console.log('server is running');
 });
 
-const DB_URL=  "mongodb+srv://ducpt:ducphamtrung@learnbe.jhobe1k.mongodb.net/?retryWrites=true&w=majority"
+const DB_URL=  "mongodb+srv://ducpt:ducphamtrung@learnbe.jhobe1k.mongodb.net/?retryWrites=true&w=majority&appName=LearnBE"
 
 mongoose.Promise = Promise;
 mongoose.connect(DB_URL);

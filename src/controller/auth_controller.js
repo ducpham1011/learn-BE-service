@@ -1,9 +1,9 @@
 import express from 'express';
-import { createUser, getUserByEmail } from '../database/user_db.js';
+import { createUser, getUserByEmail, getUserById } from '../database/user_db.js';
 import md5 from 'crypto-js/md5.js';
 import ErrorResponse from '../model/error_response.js';
 import SuccessResponse from '../model/success_response.js';
-import { generateToken, generateRefreshToken } from '../helper/jwt_helper.js';
+import { generateToken, generateRefreshToken, verifyRefreshToken } from '../helper/jwt_helper.js';
 
 export const registerUser = async (req, res) => {
   try {
@@ -33,7 +33,7 @@ export const registerUser = async (req, res) => {
     return res.status(200).send(new SuccessResponse('Register successed')).end();
   } catch (e) {
     console.log(e);
-    res.sendStatus(500).send(new ErrorResponse(e));
+    return res.sendStatus(500).send(new ErrorResponse(e));
   }
 }
 
@@ -74,5 +74,38 @@ export const login = async (req, res) => {
   } catch (e) {
     console.log(e);
     res.sendStatus(500).send(new ErrorResponse(e));
+  }
+}
+
+export const refreshToken = async (req, res) => {
+  try {
+    const { refreshToken } = req.body;
+    if (!refreshToken) {
+      return res.status(400).send(new ErrorResponse(400, 'Resfresh token invalid'));
+    }
+    const payload = verifyRefreshToken(refreshToken);
+    console.log(payload);
+
+    const user = await getUserById(payload.id);
+    if (!user) {
+      return res.sendStatus(401);
+    }
+
+    const newPayload = {
+      id: payload.id,
+      email: payload.email,
+    };
+
+    const newAccessToken = generateToken(newPayload);
+    const newRefreshToken = generateRefreshToken(newPayload);
+
+    const resRefeshToken = {
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken,
+    }
+    return res.status(200).send(new SuccessResponse('Refresh token successful', resRefeshToken)).end();
+
+  } catch (e) {
+    return res.sendStatus(500).send(new ErrorResponse(e));
   }
 }
