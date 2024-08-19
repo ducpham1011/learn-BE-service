@@ -1,5 +1,6 @@
 import express from 'express';
 import { createUser, getUserByEmail, getUserById } from '../database/user_db.js';
+import { getUserRoleByName } from '../database/permission_db.js';
 import md5 from 'crypto-js/md5.js';
 import ErrorResponse from '../model/error_response.js';
 import SuccessResponse from '../model/success_response.js';
@@ -24,16 +25,20 @@ export const registerUser = async (req, res) => {
       return res.status(400).send(new ErrorResponse('User has exist'));
     }
 
+    const roleUser = await getUserRoleByName('READ');
+
     const user = await createUser({
       name,
       email,
-      password: md5(password)
-    })
+      password: md5(password),
+      role: [roleUser]
+    });
+
 
     return res.status(200).send(new SuccessResponse('Register successed')).end();
   } catch (e) {
     console.log(e);
-    return res.sendStatus(500).send(new ErrorResponse(e));
+    return res.status(500).send(new ErrorResponse(e));
   }
 }
 
@@ -58,6 +63,7 @@ export const login = async (req, res) => {
     const payload = {
       id: user.id,
       email: user.email,
+      role: user.role
     };
 
     const accessToken = generateToken(payload);
@@ -73,7 +79,7 @@ export const login = async (req, res) => {
     return res.status(200).send(new SuccessResponse('Login successful', resUser));
   } catch (e) {
     console.log(e);
-    res.sendStatus(500).send(new ErrorResponse(e));
+    return res.status(500).send(new ErrorResponse(e));
   }
 }
 
@@ -106,6 +112,6 @@ export const refreshToken = async (req, res) => {
     return res.status(200).send(new SuccessResponse('Refresh token successful', resRefeshToken)).end();
 
   } catch (e) {
-    return res.sendStatus(500).send(new ErrorResponse(e));
+    return res.status(500).send(new ErrorResponse(e));
   }
 }

@@ -21,7 +21,7 @@ export const isAuthentication = async (req, res, next) => {
         } else {
             return res.sendStatus(401);
         }
-    } catch(e){
+    } catch (e) {
         console.log(e);
         return res.sendStatus(401)
     }
