@@ -31,7 +31,7 @@ export const registerUser = async (req, res) => {
       name,
       email,
       password: md5(password),
-      role: [roleUser]
+      role: [roleUser.id]
     });
 
 
