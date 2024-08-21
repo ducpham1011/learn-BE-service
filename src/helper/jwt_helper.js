@@ -1,10 +1,10 @@
 import jwt from 'jsonwebtoken';
 import 'dotenv/config.js';
 
-const expireAccessTokenTime = '1h';
-const expireRefreshTokenTime = '7d';
-const accessTokenSecret = "ABC@1234";
-const refreshTokenSecret = "DEF@1234";
+const expireAccessTokenTime = process.env.expireAccessTokenTime;
+const expireRefreshTokenTime = process.env.expireRefreshTokenTime;
+const accessTokenSecret = process.env.accessTokenSecret;
+const refreshTokenSecret = process.env.refreshTokenSecret;
 
 export const generateToken = (payload) => {
     const token = jwt.sign(payload, accessTokenSecret, { algorithm: 'HS256', expiresIn: expireAccessTokenTime });
